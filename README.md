@@ -5,4 +5,8 @@ The steps:
 1. Register your provider to get the originator Id
 https://outlook.office.com/connectors/oam/publish
 2. Replace your originator Id in Card.Json file
-3. Run SendMail.ps1 to send the test Adaptive Card
+   
+3. Download the files to a folder
+   
+4. Run SendMail.ps1 to send the test Adaptive Card
+   .\SendMail.ps1 -recipientEmail 'freeman@vjqg8.onmicrosoft.com'
