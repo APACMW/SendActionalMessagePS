@@ -46,13 +46,12 @@ function Send-AdaptiveCardEmail {
     # Send the message
     try {
         Write-Host "`nSending email..." -ForegroundColor Green
-        Send-MgUserMail -UserId $senderMail -BodyParameter $params
+        Send-MgUserMail -UserId $senderMail -BodyParameter $params -Debug
         Write-Host "Email sent successfully!" -ForegroundColor Green
     
         Write-Host "`nNext steps:" -ForegroundColor Yellow
         Write-Host "1. Check your email for the adaptive card" -ForegroundColor White
-        Write-Host "2. If card doesn't appear, install 'Actionable Messages Debugger' add-in" -ForegroundColor White
-        Write-Host "3. For sending to others, register at: https://aka.ms/publishoam" -ForegroundColor White
+        Write-Host "2. If card doesn't appear, install 'Actionable Messages Debugger' add-in" -ForegroundColor White        
     }
     catch {
         Write-Error "Failed to send email: $($_.Exception.Message)"
