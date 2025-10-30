@@ -1,0 +1,34 @@
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.4",
+    "originator": "236fe588-5121-4daa-9faa-05ade087e2be",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "Welcome to Exchange Online!",
+            "weight": "Bolder",
+            "size": "Medium"
+        },
+        {
+            "type": "TextBlock",
+            "text": "This is a sample adaptive card sent via Outlook actionable message.",
+            "wrap": true
+        },
+        {
+            "type": "Image",
+            "url": "https://adaptivecards.io/content/cats/1.png",
+            "size": "Medium"
+        },
+        {
+            "type": "ActionSet",
+            "actions": [
+                {
+                    "type": "Action.OpenUrl",
+                    "title": "Learn More",
+                    "url": "https://adaptivecards.io"
+                }
+            ]
+        }
+    ]
+}
