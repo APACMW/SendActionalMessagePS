@@ -46,7 +46,7 @@ function Send-AdaptiveCardEmail {
     # Send the message
     try {
         Write-Host "`nSending email..." -ForegroundColor Green
-        Send-MgUserMail -UserId $senderMail -BodyParameter $params -Debug
+        Send-MgUserMail -UserId $senderMail -BodyParameter $params
         Write-Host "Email sent successfully!" -ForegroundColor Green
     
         Write-Host "`nNext steps:" -ForegroundColor Yellow
