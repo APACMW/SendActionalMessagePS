@@ -9,4 +9,4 @@ https://outlook.office.com/connectors/oam/publish
 3. Download the files to a folder
    
 4. Run SendMail.ps1 to send the test Adaptive Card
-   .\SendMail.ps1 -recipientEmail 'freeman@vjqg8.onmicrosoft.com'
+   .\SendMail.ps1 -recipientEmails "freeman@MngEnvMCAP965703.onmicrosoft.com", "doqi@MngEnvMCAP965703.onmicrosoft.com";
