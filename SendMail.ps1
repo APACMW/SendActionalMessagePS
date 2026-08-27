@@ -1,13 +1,28 @@
+<#
+.SYNOPSIS
+    Sends an adaptive card email to specified recipients.
+.DESCRIPTION
+    This script sends an adaptive card email to the specified recipients using Microsoft Graph API. It reads the adaptive card JSON from a file and formats it into an HTML email body. The script requires the Microsoft Graph PowerShell module to be installed and authenticated.
+.NOTES
+    author: Dong Qi (doqi@microsoft.com)
+.PARAMETER recipientEmails
+    The email addresses of the recipients.
+.EXAMPLE
+    .\SendMail.ps1 -recipientEmails "freeman@MngEnvMCAP965703.onmicrosoft.com", "doqi@MngEnvMCAP965703.onmicrosoft.com";
+#>
 param (
-    [string]$recipientEmail
+    [string[]]$recipientEmails
 )
 function Send-AdaptiveCardEmail {
     param (
         [string]$cardFilePath,
         [string]$htmlTemplatePath,
-        [string]$recipientEmail
+        [string[]]$recipientEmails
     )
-
+    if (-not $recipientEmails -or $recipientEmails.Count -eq 0) {
+        Write-Error "Recipient email address is required."
+        exit 1
+    }
     Connect-MgGraph -Scopes "Mail.Send"
     # Read and validate the card JSON
     $cardJson = Get-Content $cardFilePath -Encoding UTF8
@@ -22,8 +37,15 @@ function Send-AdaptiveCardEmail {
     Write-Host $messageHtml -ForegroundColor Cyan
 
     $senderMail = (Get-MgContext).Account;
-    $recipientMail = $recipientEmail;
 
+    $toRecipients = @()
+    foreach ($recipientMail in $recipientEmails) {
+        $toRecipients += @{
+            EmailAddress = @{
+                Address = $recipientMail
+            }
+        }
+    }
     $nowString = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmss')
     $params = @{
         Message         = @{
@@ -32,13 +54,7 @@ function Send-AdaptiveCardEmail {
                 ContentType = "HTML"
                 Content     = $messageHtml
             }
-            ToRecipients = @(
-                @{
-                    EmailAddress = @{
-                        Address = $recipientMail
-                    }
-                }
-            )
+            ToRecipients = $toRecipients
         }
         SaveToSentItems = $true
     }
@@ -61,22 +77,26 @@ function Send-AdaptiveCardEmail {
     }
 }
 
-# main script execution
-$scriptFilePath = $MyInvocation.MyCommand.Path;
-$folderPath = Split-Path $scriptFilePath;
-$cardFilePath = Join-Path $folderPath "Card.json";
-$htmlTemplatePath = Join-Path $folderPath "MessageBody.html";
-
-if ((Test-Path -Path $cardFilePath) -and (Test-Path -Path $htmlTemplatePath)) {
-    if ($recipientEmail -match '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$') {
-        Send-AdaptiveCardEmail -cardFilePath $cardFilePath -htmlTemplatePath $htmlTemplatePath -recipientEmail $recipientEmail;
+function main {
+    param (
+        [string[]]$recipientEmails
+    )
+    $recipientEmails = @($recipientEmails | Where-Object { $_ -match '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' } | Select-Object -Unique)
+    if (-not $recipientEmails -or $recipientEmails.Count -eq 0) {
+        Write-Error "Recipient email address is required."
+        exit 1
+    }
+    $folderPath = $PSScriptRoot
+    $cardFilePath = Join-Path $folderPath "Card.json";
+    $htmlTemplatePath = Join-Path $folderPath "MessageBody.html";
+    if ((Test-Path -Path $cardFilePath) -and (Test-Path -Path $htmlTemplatePath)) {
+        Send-AdaptiveCardEmail -cardFilePath $cardFilePath -htmlTemplatePath $htmlTemplatePath -recipientEmails $recipientEmails
     }
     else {
-        Write-Error "Invalid email address format: $recipientEmail"
+        Write-Error "Required files not found. Ensure the file $cardFilePath and $htmlTemplatePath exist."
         exit 1
     }
 }
-else {
-    Write-Error "Required files not found. Ensure the file $cardFilePath and $htmlTemplatePath exist."
-    exit 1
-}
+
+# main script execution
+main -recipientEmails $recipientEmails;
